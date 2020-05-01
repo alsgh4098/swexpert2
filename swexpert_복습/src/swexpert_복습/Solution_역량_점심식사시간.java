@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import swexpert_복습.Solution_점심식사시간.Pair;
-
 public class Solution_역량_점심식사시간 {
 
 	static int[][] map;
@@ -21,9 +19,7 @@ public class Solution_역량_점심식사시간 {
 	static class People {
 		int x;
 		int y;
-		int time;
 		int stair;
-		int state;
 		int len;
 
 		public People(int x, int y) {
@@ -106,143 +102,60 @@ public class Solution_역량_점심식사시간 {
 
 	private static int calc() {
 
-		// 첫번째 계단을 택한 사람
-		List<People> stair1 = new ArrayList<People>();
-		// 두번째 계단을 택한 사람
-		List<People> stair2 = new ArrayList<People>();
+		// 사람
+		List<People> stair = new ArrayList<People>();
 
 		// 첫번째 계단을 내려가고 있는 사람
-		List<People> down1 = new ArrayList<People>();
+		List<Integer> down1 = new ArrayList<Integer>();
 		// 두번째 계단을 내려가고 있는 사람
-		List<People> down2 = new ArrayList<People>();
-		
-		int pcnt1 = 0;
-		int pcnt2 = 0;
-		
-		
+		List<Integer> down2 = new ArrayList<Integer>();
+
 		for (int i = 0; i < pcnt; i++) {
-			if (parr[i].stair == 0) {
-				stair1.add(parr[i]);
-				pcnt1++;
-			} else if (parr[i].stair == 1) {
-				stair2.add(parr[i]);
-				pcnt2++;
-			}
+			stair.add(parr[i]);
 		}
 
-		// 계단과의 거리가 짧은순으로 사람들을 정렬.
-		Collections.sort(stair1, new Comparator<People>() {
-			@Override
-			public int compare(People o1, People o2) {
-				if (o1.len < o2.len) {
-					return -1;
-				} else {
-					return 1;
-				}
-			}
-		});
-
-		Collections.sort(stair2, new Comparator<People>() {
-			@Override
-			public int compare(People o1, People o2) {
-				if (o1.len < o2.len) {
-					return -1;
-				} else {
-					return 1;
-				}
-			}
-		});
-
-		// 내려가는 중인 사람을 넣음.
-		int cnt = 0;
-
-		for (Iterator<People> iter = stair1.iterator(); iter.hasNext();) {
-			People ppl = iter.next();
-			down1.add(ppl);
-			iter.remove();
-			cnt++;
-			if (cnt == 3) {
-				break;
-			}
-		}
-
-		cnt = 0;
-		for (Iterator<People> iter = stair2.iterator(); iter.hasNext();) {
-			People ppl = iter.next();
-			down2.add(ppl);
-			iter.remove();
-			cnt++;
-			if (cnt == 3) {
-				break;
-			}
-		}
-
-		int time1 = 0;
+		int time = 0;
 		int downcnt = 0;
-		// 첫번째 계단에서
-		while (true && pcnt1!=0) {
-			boolean finish = false;
-			time1++;
-			for (Iterator<People> iter = down1.iterator(); iter.hasNext();) {
-				People ppl = iter.next();
-				if (ppl.len + 1 + sarr[0].val <= time1) {
+
+		while (downcnt != pcnt) {
+
+			time++;
+
+
+			for (Iterator<Integer> iter = down1.iterator(); iter.hasNext();) {
+				Integer depth = iter.next();
+				if (depth <= time) {
 					iter.remove();
 					downcnt++;
-					if(downcnt == pcnt1) {
-						finish = true;
-						break;
-					}
 				}
 			}
-			
-			if(finish) {
-				break;
-			}
 
-
-			for (Iterator<People> iter = stair1.iterator(); iter.hasNext();) {
-				People ppl = iter.next();
-				if (ppl.len + 1 <= time1 && down1.size() < 3) {
-					down1.add(ppl);
-					iter.remove();
-				}
-			}
-		}
-
-		int time2 = 0;
-		downcnt = 0;
-		// 두번째 계단에서
-		while (true && pcnt2!=0) {
-			boolean finish = false;
-			time2++;
-			for (Iterator<People> iter = down2.iterator(); iter.hasNext();) {
-				People ppl = iter.next();
-				if (ppl.len + 1 + sarr[1].val <= time2) {
+			for (Iterator<Integer> iter = down2.iterator(); iter.hasNext();) {
+				Integer depth = iter.next();
+				if (depth <= time) {
 					iter.remove();
 					downcnt++;
-					if(downcnt == pcnt2) {
-						finish = true;
-						break;
+				}
+			}
+
+			for (Iterator<People> iter = stair.iterator(); iter.hasNext();) {
+				People ppl = iter.next();
+				if (ppl.stair == 1) {
+					if (ppl.len + 1 <= time && down1.size() < 3) {
+						down1.add(time + sarr[ppl.stair].val);
+						iter.remove();
+					}
+				} else {
+					if (ppl.len + 1 <= time && down2.size() < 3) {
+						down2.add(time + sarr[ppl.stair].val);
+						iter.remove();
 					}
 				}
-			}
-			
-			if(finish) {
-				break;
+				
 			}
 
-
-			for (Iterator<People> iter = stair2.iterator(); iter.hasNext();) {
-				People ppl = iter.next();
-				if (ppl.len + 1 <= time2 && down2.size() < 3) {
-					down2.add(ppl);
-					iter.remove();
-				}
-			}
-			
-		}
-
-		return Math.max(time1, time2);
-	}
+		} // end while
+		return time;
+	}// end method
 
 }
